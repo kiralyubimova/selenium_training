@@ -3,6 +3,8 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NUnit.Framework;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
+using OpenQA.Selenium.Firefox;
+using OpenQA.Selenium.IE;
 
 namespace Task_one_project
 {
@@ -14,7 +16,7 @@ namespace Task_one_project
         [SetUp]
         public void start()
         {
-            driver = new ChromeDriver();
+            driver = new FirefoxDriver();
         }
 
         [Test]
