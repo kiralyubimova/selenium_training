@@ -4,6 +4,7 @@ using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Firefox;
 using System.Collections.ObjectModel;
+using System.Linq;
 
 namespace Task_one_project
 {
@@ -13,16 +14,17 @@ namespace Task_one_project
         private IWebDriver driver;
 
         [SetUp]
-        public void start()
+        public void Start()
         {
             driver = new ChromeDriver();
+            driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(10);
         }
 
         public bool IsElementPresent(By locator)
         {
             try
             {
-                driver.FindElement(By.CssSelector("h1"));
+                driver.FindElement(locator);
                 return true;
             }
             catch (NoSuchElementException)
@@ -31,7 +33,7 @@ namespace Task_one_project
             }
         }
 
-[Test]
+        [Test]
         public void AdminPageLogin()
         {
             driver.Url = "http://localhost/litecart/admin/";
@@ -61,8 +63,21 @@ namespace Task_one_project
             }
         }
 
+        [Test]
+        public void StickerCheck()
+        {
+            driver.Url = "http://localhost/litecart";
+            ReadOnlyCollection<IWebElement> goods = driver.FindElements(By.CssSelector(".product"));
+            for (int i = 0; i < goods.Count; i++)
+            {
+                IWebElement listItem = goods[i];
+                ReadOnlyCollection<IWebElement> stickers = listItem.FindElements(By.ClassName("sticker"));
+                Assert.True(stickers.Count() == 1);
+            }
+        }
+
         [TearDown]
-        public void stop()
+        public void Stop()
         {
             driver.Quit();
             driver = null;

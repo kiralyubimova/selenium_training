@@ -14,7 +14,7 @@ namespace Task_one_project
         private IWebDriver driver;
 
         [SetUp]
-        public void start()
+        public void Start()
         {
             driver = new FirefoxDriver();
         }
@@ -26,7 +26,7 @@ namespace Task_one_project
         }
 
         [TearDown]
-        public void stop()
+        public void Stop()
         {
             driver.Quit();
             driver = null;
