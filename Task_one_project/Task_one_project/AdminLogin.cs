@@ -106,12 +106,13 @@ namespace Task_one_project
                 Assert.True(countriesTexts[i] == countriesTextsOrdered[i]);
             }
 
-            ReadOnlyCollection<IWebElement> zones = driver.FindElements(By.CssSelector(".dataTable td:nth-of-type(6)");
+            ReadOnlyCollection<IWebElement> zones = driver.FindElements(By.CssSelector(".dataTable td:nth-of-type(6)"));
+            int zone = new int();
             for (int i = 0; i < zones.Count; i++)
             {
-                int zone = int.Parse(zones[i].GetAttribute("textContent"));
+                zone = int.Parse(zones[i].GetAttribute("textContent"));
             }
-            if ()
+            if (zone > 0)
             {
 
             }
