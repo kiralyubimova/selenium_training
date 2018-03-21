@@ -5,6 +5,7 @@ using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Firefox;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace Task_one_project
 {
@@ -33,13 +34,18 @@ namespace Task_one_project
             }
         }
 
-        [Test]
-        public void AdminPageLogin()
+        public void Login()
         {
             driver.Url = "http://localhost/litecart/admin/";
             driver.FindElement(By.Name("username")).SendKeys("admin");
             driver.FindElement(By.Name("password")).SendKeys("admin");
             driver.FindElement(By.Name("login")).Click();
+        }
+
+        [Test]
+        public void AdminPageLogin()
+        {
+            Login();
             ReadOnlyCollection<IWebElement> menu = driver.FindElements(By.CssSelector("#app- > a"));
             for(int i = 0; i < menu.Count; i++)
             {
@@ -73,6 +79,41 @@ namespace Task_one_project
                 IWebElement listItem = goods[i];
                 ReadOnlyCollection<IWebElement> stickers = listItem.FindElements(By.ClassName("sticker"));
                 Assert.True(stickers.Count() == 1);
+            }
+        }
+
+        [Test]
+        public void AlphabeticOrder_1()
+        {
+            Login();
+
+            driver.Url = "http://localhost/litecart/admin/?app=countries&doc=countries";
+            ReadOnlyCollection<IWebElement> countriesLink = driver.FindElements(By.CssSelector(".dataTable > a"));
+            List<string> countriesTexts = new List<string>();
+            for (int i = 0; i < countriesLink.Count; i++)
+            {
+                IWebElement countryLink = countriesLink[i];
+                countriesTexts.Add(countryLink.GetAttribute("textContent"));
+            }
+            List<string> countriesTextsOrdered = new List<string>();
+            for(int i = 0; i < countriesTexts.Count; i++)
+            {
+                countriesTextsOrdered.Add(countriesTexts[i]);
+            }
+            countriesTextsOrdered.Sort();
+            for(int i = 0; i < countriesTexts.Count; i++)
+            {
+                Assert.True(countriesTexts[i] == countriesTextsOrdered[i]);
+            }
+
+            ReadOnlyCollection<IWebElement> zones = driver.FindElements(By.CssSelector(".dataTable td:nth-of-type(6)");
+            for (int i = 0; i < zones.Count; i++)
+            {
+                int zone = int.Parse(zones[i].GetAttribute("textContent"));
+            }
+            if ()
+            {
+
             }
         }
 
