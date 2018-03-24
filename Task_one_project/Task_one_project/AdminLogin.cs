@@ -158,7 +158,8 @@ namespace Task_one_project
                 List<string> zonesListSorted = new List<string>();
                 for (int i = 1; i < zones.Count-1; i++)
                 {
-                    string zoneSelected = zones[i].FindElement(By.CssSelector("td [selected]")).GetAttribute("textContent");
+                    string zoneSelected = zones[i].FindElements(By.CssSelector("td"))[2]
+                        .FindElement(By.CssSelector("[selected]")).GetAttribute("textContent");
                     zonesList.Add(zoneSelected);
                     zonesListSorted.Add(zoneSelected);
                 }
