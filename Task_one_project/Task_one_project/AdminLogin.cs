@@ -171,6 +171,29 @@ namespace Task_one_project
             }
         }
 
+        [Test]
+        public void GoodsPage()
+        {
+            driver.Url = "http://localhost/litecart";
+            IWebElement goodCampaigns = driver.FindElement(By.CssSelector("#box-campaigns .link"));
+
+            //Main Page
+            string goodNameMainPage = goodCampaigns.FindElement(By.CssSelector(".name")).GetAttribute("textContent");
+
+            string goodPriceRegularMainPage = goodCampaigns.FindElement(By.CssSelector(".regular-price")).GetAttribute("textContent");
+            string textStyle = goodCampaigns.FindElement(By.CssSelector(".regular-price")).GetCssValue("text-decoration-line");
+            string textColor = goodCampaigns.FindElement(By.CssSelector(".regular-price")).GetCssValue("color");
+
+            string[] numbers = textColor.Replace("rgb(", "").Replace(")", "").Split(',');
+            int r = int.Parse(numbers[0].Trim());
+            int g = int.Parse(numbers[1].Trim());
+            int b = int.Parse(numbers[2].Trim());
+
+            string goodPriceCampaignMainPage = goodCampaigns.FindElement(By.CssSelector(".campaign-price")).GetAttribute("textContent");
+
+            Assert.AreEqual(textStyle, "line-through");
+        }
+
         [TearDown]
         public void Stop()
         {
