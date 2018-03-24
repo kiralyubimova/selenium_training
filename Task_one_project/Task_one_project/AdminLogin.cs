@@ -83,39 +83,57 @@ namespace Task_one_project
         }
 
         [Test]
-        public void AlphabeticOrder_1()
+        public void AlphabeticalOrder_1()
         {
             Login();
 
             driver.Url = "http://localhost/litecart/admin/?app=countries&doc=countries";
-            ReadOnlyCollection<IWebElement> countriesLink = driver.FindElements(By.CssSelector(".dataTable > a"));
-            List<string> countriesTexts = new List<string>();
-            for (int i = 0; i < countriesLink.Count; i++)
+            ReadOnlyCollection<IWebElement> rows = driver.FindElements(By.CssSelector(".row"));
+            List<CountryData> countries = new List<CountryData>();
+            for (int i = 0; i < rows.Count; i++)
             {
-                IWebElement countryLink = countriesLink[i];
-                countriesTexts.Add(countryLink.GetAttribute("textContent"));
-            }
-            List<string> countriesTextsOrdered = new List<string>();
-            for(int i = 0; i < countriesTexts.Count; i++)
-            {
-                countriesTextsOrdered.Add(countriesTexts[i]);
-            }
-            countriesTextsOrdered.Sort();
-            for(int i = 0; i < countriesTexts.Count; i++)
-            {
-                Assert.True(countriesTexts[i] == countriesTextsOrdered[i]);
-            }
-
-            ReadOnlyCollection<IWebElement> zones = driver.FindElements(By.CssSelector(".dataTable td:nth-of-type(6)"));
-            int zone = new int();
-            for (int i = 0; i < zones.Count; i++)
-            {
-                zone = int.Parse(zones[i].GetAttribute("textContent"));
-            }
-            if (zone > 0)
-            {
+                IWebElement countryRow = rows[i];
+                ReadOnlyCollection<IWebElement> columns = countryRow.FindElements(By.CssSelector("td"));
+                CountryData newCountry = new CountryData(columns[4].GetAttribute("textContent"));
+                newCountry.Code = columns[3].GetAttribute("textContent");
+                newCountry.ZonesCount = int.Parse(columns[5].GetAttribute("textContent"));
+                newCountry.Link = columns[4].FindElement(By.CssSelector("a")).GetAttribute("href");
+                countries.Add(newCountry);
 
             }
+            List<CountryData> countriesOrdered = new List<CountryData>();
+            for(int i = 0; i < countries.Count; i++)
+            {
+                countriesOrdered.Add(countries[i]);
+            }
+            countriesOrdered.Sort();
+            for(int i = 0; i < countries.Count; i++)
+            {
+                Assert.True(countries[i] == countriesOrdered[i]);
+            }
+
+            foreach(CountryData country in countries)
+            {
+                if (country.ZonesCount != 0)
+                {
+                    driver.Url = country.Link;
+                    ReadOnlyCollection<IWebElement> zonesTable = driver.FindElements(By.CssSelector("#table-zones tr"));
+                    List<string> zonesSorted = new List<string>();
+                    for (int i = 1; i < zonesTable.Count-1; i++) //first element with index == 0 is header and we skip it. last element contents input fields for new zone
+                    {
+                        string zoneName = zonesTable[i].FindElements(By.CssSelector("td"))[2].GetAttribute("textContent");
+                        country.Zones.Add(zoneName);
+                        zonesSorted.Add(zoneName);
+                    }
+                    Assert.IsTrue(country.ZonesCount == country.Zones.Count);
+                    zonesSorted.Sort();
+                    for(int i = 0; i < zonesSorted.Count; i++)
+                    {
+                        Assert.IsTrue(zonesSorted[i] == country.Zones[i]);
+                    }
+                }
+            }
+
         }
 
         [TearDown]

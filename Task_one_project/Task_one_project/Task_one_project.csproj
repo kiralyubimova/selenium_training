@@ -59,6 +59,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AdminLogin.cs" />
+    <Compile Include="CountryData.cs" />
     <Compile Include="VisitPage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
