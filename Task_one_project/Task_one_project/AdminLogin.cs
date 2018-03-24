@@ -99,7 +99,6 @@ namespace Task_one_project
                 newCountry.ZonesCount = int.Parse(columns[5].GetAttribute("textContent"));
                 newCountry.Link = columns[4].FindElement(By.CssSelector("a")).GetAttribute("href");
                 countries.Add(newCountry);
-
             }
             List<CountryData> countriesOrdered = new List<CountryData>();
             for(int i = 0; i < countries.Count; i++)
@@ -134,6 +133,41 @@ namespace Task_one_project
                 }
             }
 
+        }
+
+        [Test]
+        public void AlphabeticalOrderGeoZonesPage()
+        {
+            Login();
+            driver.Url = "http://localhost/litecart/admin/?app=geo_zones&doc=geo_zones";
+            ReadOnlyCollection<IWebElement> rows = driver.FindElements(By.CssSelector(".row"));
+            List<CountryData> countries = new List<CountryData>();
+            for (int i = 0; i < rows.Count; i++)
+            {
+                IWebElement countryRow = rows[i];
+                ReadOnlyCollection<IWebElement> columns = countryRow.FindElements(By.CssSelector("td"));
+                CountryData newCountry = new CountryData(columns[2].GetAttribute("textContent"));
+                newCountry.Link = columns[2].FindElement(By.CssSelector("a")).GetAttribute("href");
+                countries.Add(newCountry);
+            }
+            foreach (CountryData country in countries)
+            {
+                driver.Url = country.Link;
+                ReadOnlyCollection<IWebElement> zones = driver.FindElements(By.CssSelector("#table-zones tr"));
+                List<string> zonesList = new List<string>();
+                List<string> zonesListSorted = new List<string>();
+                for (int i = 1; i < zones.Count-1; i++)
+                {
+                    string zoneSelected = zones[i].FindElement(By.CssSelector("td [selected]")).GetAttribute("textContent");
+                    zonesList.Add(zoneSelected);
+                    zonesListSorted.Add(zoneSelected);
+                }
+                zonesListSorted.Sort();
+                for (int i = 0; i < zonesList.Count; i++)
+                {
+                    Assert.IsTrue(zonesList[i] == zonesListSorted[i]);
+                }
+            }
         }
 
         [TearDown]
