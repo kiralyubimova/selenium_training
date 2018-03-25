@@ -172,26 +172,82 @@ namespace Task_one_project
         }
 
         [Test]
-        public void GoodsPage()
+        public void ProductsPage()
         {
-            driver.Url = "http://localhost/litecart";
-            IWebElement goodCampaigns = driver.FindElement(By.CssSelector("#box-campaigns .link"));
-
             //Main Page
-            string goodNameMainPage = goodCampaigns.FindElement(By.CssSelector(".name")).GetAttribute("textContent");
+            driver.Url = "http://localhost/litecart";
+            IWebElement productCampaigns = driver.FindElement(By.CssSelector("#box-campaigns .link"));
 
-            string goodPriceRegularMainPage = goodCampaigns.FindElement(By.CssSelector(".regular-price")).GetAttribute("textContent");
-            string textStyle = goodCampaigns.FindElement(By.CssSelector(".regular-price")).GetCssValue("text-decoration-line");
-            string textColor = goodCampaigns.FindElement(By.CssSelector(".regular-price")).GetCssValue("color");
+            string productNameMainPage = productCampaigns.FindElement(By.CssSelector(".name")).GetAttribute("textContent");
 
-            string[] numbers = textColor.Replace("rgb(", "").Replace(")", "").Split(',');
+            string productPriceRegularMainPage = productCampaigns.FindElement(By.CssSelector(".regular-price")).GetAttribute("textContent");
+            float regularPriceMain = float.Parse(productPriceRegularMainPage.Replace("$", ""));
+            string textStyle = productCampaigns.FindElement(By.CssSelector(".regular-price")).GetCssValue("text-decoration-line");
+            string textSizeRegular = productCampaigns.FindElement(By.CssSelector(".regular-price")).GetCssValue("font-size");
+            float fontSizeRegular = float.Parse(textSizeRegular.Replace("px", ""));
+            string textColor = productCampaigns.FindElement(By.CssSelector(".regular-price")).GetCssValue("color");
+            string[] numbers = textColor.Replace("rgba(", "").Replace(")", "").Split(',');
             int r = int.Parse(numbers[0].Trim());
             int g = int.Parse(numbers[1].Trim());
             int b = int.Parse(numbers[2].Trim());
-
-            string goodPriceCampaignMainPage = goodCampaigns.FindElement(By.CssSelector(".campaign-price")).GetAttribute("textContent");
-
             Assert.AreEqual(textStyle, "line-through");
+            Assert.IsTrue(r == g && r == b);
+
+            string productPriceCampaignMainPage = productCampaigns.FindElement(By.CssSelector(".campaign-price")).GetAttribute("textContent");
+            float campaignPriceMain = float.Parse(productPriceCampaignMainPage.Replace("$", ""));
+            int textStyleCampaign = int.Parse(productCampaigns.FindElement(By.CssSelector(".campaign-price")).GetCssValue("font-weight"));
+            string textSizeCampaign = productCampaigns.FindElement(By.CssSelector(".campaign-price")).GetCssValue("font-size");
+            float fontSizeCampaign = float.Parse(textSizeCampaign.Replace("px", ""));
+            string textColorCampaign = productCampaigns.FindElement(By.CssSelector(".campaign-price")).GetCssValue("color");
+            string[] numbersCampaigns = textColorCampaign.Replace("rgba(", "").Replace(")", "").Split(',');
+            r = int.Parse(numbersCampaigns[0].Trim());
+            g = int.Parse(numbersCampaigns[1].Trim());
+            b = int.Parse(numbersCampaigns[2].Trim());
+            Assert.IsTrue(textStyleCampaign > 400);
+            Assert.IsTrue(g == 0 && b == 0);
+
+            Assert.IsTrue(fontSizeRegular < fontSizeCampaign);
+
+            //Product's Page
+            productCampaigns.Click();
+            IWebElement productPage = driver.FindElement(By.CssSelector("#box-product"));
+
+            string productNameProductPage = productPage.FindElement(By.CssSelector("h1.title")).GetAttribute("textContent");
+            Assert.AreEqual(productNameMainPage, productNameProductPage);
+
+            string productPriceRegularProductPage = productPage.FindElement(By.CssSelector(".regular-price")).GetAttribute("textContent");
+            float regularPriceProduct = float.Parse(productPriceRegularProductPage.Replace("$", ""));
+            Assert.AreEqual(regularPriceMain, regularPriceProduct);
+
+            string productPriceCampagnProductPage = productPage.FindElement(By.CssSelector(".campaign-price")).GetAttribute("textContent");
+            float campagnPriceProduct = float.Parse(productPriceCampagnProductPage.Replace("$", ""));
+            Assert.AreEqual(campaignPriceMain, campagnPriceProduct);
+
+            string productTextStyle = productPage.FindElement(By.CssSelector(".regular-price")).GetCssValue("text-decoration-line");
+            Assert.AreEqual(textStyle, "line-through");
+
+            string productTextColor = productPage.FindElement(By.CssSelector(".regular-price")).GetCssValue("color");
+            string[] colors = textColor.Replace("rgba(", "").Replace(")", "").Split(',');
+            r = int.Parse(colors[0].Trim());
+            g = int.Parse(colors[1].Trim());
+            b = int.Parse(colors[2].Trim());
+            Assert.IsTrue(r == g && r == b);
+
+            int productTextStyleCampaign = int.Parse(productPage.FindElement(By.CssSelector(".campaign-price")).GetCssValue("font-weight"));
+            Assert.IsTrue(productTextStyleCampaign > 400);
+
+            string productTextColorCampaign = productPage.FindElement(By.CssSelector(".campaign-price")).GetCssValue("color");
+            string[] colorsCampaigns = textColorCampaign.Replace("rgba(", "").Replace(")", "").Split(',');
+            r = int.Parse(colorsCampaigns[0].Trim());
+            g = int.Parse(colorsCampaigns[1].Trim());
+            b = int.Parse(colorsCampaigns[2].Trim());
+            Assert.IsTrue(g == 0 && b == 0);
+
+            string productTextSizeRegular = productPage.FindElement(By.CssSelector(".regular-price")).GetCssValue("font-size");
+            float productFontSizeRegular = float.Parse(productTextSizeRegular.Replace("px", ""));
+            string productTextSizeCampaign = productPage.FindElement(By.CssSelector(".campaign-price")).GetCssValue("font-size");
+            float productFontSizeCampaign = float.Parse(productTextSizeCampaign.Replace("px", ""));
+            Assert.IsTrue(productFontSizeRegular < productFontSizeCampaign);
         }
 
         [TearDown]
