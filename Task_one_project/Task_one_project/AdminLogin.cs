@@ -6,6 +6,8 @@ using OpenQA.Selenium.Firefox;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Collections.Generic;
+using OpenQA.Selenium.Interactions;
+using OpenQA.Selenium.Support.UI;
 
 namespace Task_one_project
 {
@@ -40,6 +42,18 @@ namespace Task_one_project
             driver.FindElement(By.Name("username")).SendKeys("admin");
             driver.FindElement(By.Name("password")).SendKeys("admin");
             driver.FindElement(By.Name("login")).Click();
+        }
+
+        public string GetRandomString(Random random, int length)
+        {
+            char[] chars = "abcdefghijklmnopqrstuvw0987654321".ToCharArray();
+            string str = "";
+            for (int i = 0; i < length; i++)
+            {
+                int index = random.Next(0, chars.Length - 1);
+                str += chars[index];
+            }
+            return str;
         }
 
         [Test]
@@ -248,6 +262,47 @@ namespace Task_one_project
             string productTextSizeCampaign = productPage.FindElement(By.CssSelector(".campaign-price")).GetCssValue("font-size");
             float productFontSizeCampaign = float.Parse(productTextSizeCampaign.Replace("px", ""));
             Assert.IsTrue(productFontSizeRegular < productFontSizeCampaign);
+        }
+
+        [Test]
+        public void NewUser()
+        {
+            // регистрация новой учётной записи с достаточно уникальным адресом электронной почты (чтобы не конфликтовало с ранее созданными пользователями, в том числе при предыдущих запусках того же самого сценария),
+            driver.Url = "http://localhost/litecart";
+            driver.FindElement(By.LinkText("New customers click here")).Click();
+            driver.FindElement(By.Name("tax_id")).SendKeys("12345");
+            driver.FindElement(By.Name("company")).SendKeys("ABC");
+            driver.FindElement(By.Name("firstname")).SendKeys("John");
+            driver.FindElement(By.Name("lastname")).SendKeys("Smith");
+            driver.FindElement(By.Name("address1")).SendKeys("Elm street 12345");
+            driver.FindElement(By.Name("address2")).SendKeys("Oak street 54321");
+            driver.FindElement(By.Name("postcode")).SendKeys("10007");
+            driver.FindElement(By.Name("city")).SendKeys("New York");
+            var country = driver.FindElement(By.Name("country_code"));
+            var selectElement = new SelectElement(country);
+            selectElement.SelectByValue("US");
+            IWebElement countryZone = driver.FindElements(By.CssSelector("tr"))[4]
+                .FindElements(By.CssSelector("td"))[1]
+                .FindElement(By.CssSelector("select"));
+            var selectState = new SelectElement(countryZone);
+            selectState.SelectByValue("AR");
+            string emailAddress = GetRandomString(new Random(), 6);
+            driver.FindElement(By.Name("email")).SendKeys(emailAddress + "@eee.eee");
+            driver.FindElement(By.Name("phone")).SendKeys("1234567890");
+            driver.FindElement(By.Name("password")).SendKeys("abc1");
+            driver.FindElement(By.Name("confirmed_password")).SendKeys("abc1");
+            driver.FindElement(By.Name("create_account")).Click();
+
+            // выход(logout), потому что после успешной регистрации автоматически происходит вход,
+            driver.FindElement(By.LinkText("Logout")).Click();
+
+            //повторный вход в только что созданную учётную запись,
+            driver.FindElement(By.Name("email")).SendKeys(emailAddress + "@eee.eee");
+            driver.FindElement(By.Name("password")).SendKeys("abc1");
+            driver.FindElement(By.Name("login")).Click();
+
+            // и ещё раз выход.
+            driver.FindElement(By.LinkText("Logout")).Click();
         }
 
         [TearDown]
