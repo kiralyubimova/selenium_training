@@ -8,6 +8,7 @@ using System.Linq;
 using System.Collections.Generic;
 using OpenQA.Selenium.Interactions;
 using OpenQA.Selenium.Support.UI;
+using System.IO;
 
 namespace Task_one_project
 {
@@ -308,7 +309,7 @@ namespace Task_one_project
         [Test]
         public void NewProduct()
         {
-            string productName = "Some product";
+            string productName = "Some product with relative image";
 
             Login();
             // открыть меню Catalog
@@ -330,7 +331,7 @@ namespace Task_one_project
             var soldOutStatus = driver.FindElement(By.Name("sold_out_status_id"));
             var selectStatus = new SelectElement(soldOutStatus);
             selectStatus.SelectByText(@"-- Select --");
-            driver.FindElement(By.Name("new_images[]")).SendKeys(@"H:\photo\photo\avas\otter.jpg");
+            driver.FindElement(By.Name("new_images[]")).SendKeys(Path.GetFullPath(AppDomain.CurrentDomain.BaseDirectory+@"..\..\images\otter.jpg"))
             driver.FindElement(By.Name("date_valid_from")).SendKeys(Keys.Home + "01/04/2018");
             driver.FindElement(By.Name("date_valid_to")).SendKeys(Keys.Home + "01/04/2020");
 
