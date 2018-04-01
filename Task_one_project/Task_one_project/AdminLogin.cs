@@ -305,6 +305,61 @@ namespace Task_one_project
             driver.FindElement(By.LinkText("Logout")).Click();
         }
 
+        [Test]
+        public void NewProduct()
+        {
+            string productName = "Some product";
+
+            Login();
+            // открыть меню Catalog
+            driver.Url = "http://localhost/litecart/admin/?app=catalog&doc=catalog";
+
+            // нажать кнопку "Add New Product"
+            driver.FindElement(By.LinkText("Add New Product")).Click();
+
+            // заполнить поля с информацией о товарe: General Tab
+            driver.FindElement(By.Name("status")).Click();
+            driver.FindElement(By.Name("name[en]")).SendKeys(productName);
+            driver.FindElement(By.Name("code")).SendKeys("123");
+            driver.FindElement(By.XPath("(//input[@name='categories[]'])[2]")).Click();
+            var categoryId = driver.FindElement(By.Name("default_category_id"));
+            var selectCategoryId = new SelectElement(categoryId);
+            selectCategoryId.SelectByText("Rubber Ducks");
+            driver.FindElement(By.XPath("(//input[@name='product_groups[]'])[3]")).Click();
+            driver.FindElement(By.Name("quantity")).SendKeys("50");
+            var soldOutStatus = driver.FindElement(By.Name("sold_out_status_id"));
+            var selectStatus = new SelectElement(soldOutStatus);
+            selectStatus.SelectByText(@"-- Select --");
+            driver.FindElement(By.Name("new_images[]")).SendKeys(@"H:\photo\photo\avas\otter.jpg");
+            driver.FindElement(By.Name("date_valid_from")).SendKeys(Keys.Home + "01/04/2018");
+            driver.FindElement(By.Name("date_valid_to")).SendKeys(Keys.Home + "01/04/2020");
+
+            // заполнить поля с информацией о товарe: Information Tab
+            driver.FindElement(By.LinkText("Information")).Click();
+            var manufacturer = driver.FindElement(By.Name("manufacturer_id"));
+            var selectManufacturer = new SelectElement(manufacturer);
+            selectManufacturer.SelectByText("ACME Corp.");
+            driver.FindElement(By.Name("keywords")).SendKeys("Keywords");
+            driver.FindElement(By.Name("short_description[en]")).SendKeys("Short Description");
+            driver.FindElement(By.CssSelector(".trumbowyg-editor")).SendKeys("Description");
+            driver.FindElement(By.Name("head_title[en]")).SendKeys("Head Title");
+            driver.FindElement(By.Name("meta_description[en]")).SendKeys("Meta Description");
+
+            // заполнить поля с информацией о товарe: Prices Tab
+            driver.FindElement(By.LinkText("Prices")).Click();
+            driver.FindElement(By.Name("purchase_price")).SendKeys(Keys.Home + "10");
+            var currency = driver.FindElement(By.Name("purchase_price_currency_code"));
+            var selectCurrency = new SelectElement(currency);
+            selectCurrency.SelectByText("Euros");
+            driver.FindElement(By.Name("gross_prices[EUR]")).SendKeys(Keys.Home + "15");
+
+            // сохранить
+            driver.FindElement(By.Name("save")).Click();
+
+            // появился в каталоге (в админке)
+            driver.FindElement(By.LinkText(productName));
+        }
+
         [TearDown]
         public void Stop()
         {
