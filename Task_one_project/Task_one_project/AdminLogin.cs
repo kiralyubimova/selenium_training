@@ -331,7 +331,7 @@ namespace Task_one_project
             var soldOutStatus = driver.FindElement(By.Name("sold_out_status_id"));
             var selectStatus = new SelectElement(soldOutStatus);
             selectStatus.SelectByText(@"-- Select --");
-            driver.FindElement(By.Name("new_images[]")).SendKeys(Path.GetFullPath(AppDomain.CurrentDomain.BaseDirectory+@"..\..\images\otter.jpg"))
+            driver.FindElement(By.Name("new_images[]")).SendKeys(Path.GetFullPath(AppDomain.CurrentDomain.BaseDirectory + @"..\..\images\otter.jpg"));
             driver.FindElement(By.Name("date_valid_from")).SendKeys(Keys.Home + "01/04/2018");
             driver.FindElement(By.Name("date_valid_to")).SendKeys(Keys.Home + "01/04/2020");
 
