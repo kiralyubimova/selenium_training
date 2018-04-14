@@ -396,6 +396,66 @@ namespace Task_one_project
             }
         }
 
+        [Test]
+        public void NewWindows()
+        {
+            // зайти в админку
+            Login();
+
+            // открыть пункт меню Countries(или страницу http://localhost/litecart/admin/?app=countries&doc=countries)
+            driver.Url = "http://localhost/litecart/admin/?app=countries&doc=countries";
+
+            // открыть на редактирование какую-нибудь страну или начать создание новой
+            driver.FindElement(By.LinkText("Add New Country")).Click();
+            string countriesWindow = driver.CurrentWindowHandle;
+
+            IList<string> handles = driver.WindowHandles;
+
+            /* возле некоторых полей есть ссылки с иконкой в виде квадратика со стрелкой --
+               они ведут на внешние страницы и открываются в новом окне, именно это и нужно проверить.
+               Конечно, можно просто убедиться в том, что у ссылки есть атрибут target = "_blank".
+            */
+
+            ReadOnlyCollection<IWebElement> externalLinks = driver.FindElements(By.CssSelector(".fa-external-link"));
+
+            // повторить эти действия для всех таких ссылок.
+            for (int i = 0; i < externalLinks.Count; i++)
+            {
+                IWebElement externalLink = externalLinks[i];
+
+                // Но в этом упражнении требуется именно кликнуть по ссылке, чтобы она открылась в новом окне,
+                externalLink.Click();
+
+                // новое окно открывается не мгновенно, поэтому требуется ожидание открытия окна.
+                WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
+                string externalWindow = wait.Until(ThereIsWindowOtherThan(handles));
+
+                // потом переключиться в новое окно, 
+                driver.SwitchTo().Window(externalWindow);
+
+                //закрыть его, 
+                driver.Close();
+
+                //вернуться обратно
+                driver.SwitchTo().Window(countriesWindow);
+            }
+        }
+
+        private Func<IWebDriver, string> ThereIsWindowOtherThan(IList<string> oldHandles)
+        {
+            IList<string> curHandles = driver.WindowHandles;
+            for(int i = 0; i < oldHandles.Count; i++)
+            {
+                curHandles.Remove(oldHandles[i]);
+            }
+            if(curHandles.Count != 0)
+            {
+                return curHandles[0];
+            }
+            return null;
+
+        }
+
         [TearDown]
         public void Stop()
         {
