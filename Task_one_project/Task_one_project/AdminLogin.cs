@@ -16,7 +16,6 @@ namespace Task_one_project
     public class AdminLogin
     {
         private IWebDriver driver;
-        private object wait;
 
         [SetUp]
         public void Start()
@@ -427,8 +426,23 @@ namespace Task_one_project
                 externalLink.Click();
 
                 // новое окно открывается не мгновенно, поэтому требуется ожидание открытия окна.
+                Func<IWebDriver, string> ThereIsWindowOtherThan = new Func<IWebDriver, string>((IWebDriver Web) =>
+                {
+                    IList<string> curHandles = driver.WindowHandles.ToList();
+                    for (int j = 0; j < handles.Count; j++)
+                    {
+                        curHandles.Remove(handles[j]);
+                    }
+                    if (curHandles.Count != 0)
+                    {
+                        return curHandles[0];
+                    }
+                    return null;
+
+                });
+
                 WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
-                string externalWindow = wait.Until(ThereIsWindowOtherThan(handles));
+                string externalWindow = wait.Until(ThereIsWindowOtherThan);
 
                 // потом переключиться в новое окно, 
                 driver.SwitchTo().Window(externalWindow);
@@ -439,21 +453,6 @@ namespace Task_one_project
                 //вернуться обратно
                 driver.SwitchTo().Window(countriesWindow);
             }
-        }
-
-        private Func<IWebDriver, string> ThereIsWindowOtherThan(IList<string> oldHandles)
-        {
-            IList<string> curHandles = driver.WindowHandles;
-            for(int i = 0; i < oldHandles.Count; i++)
-            {
-                curHandles.Remove(oldHandles[i]);
-            }
-            if(curHandles.Count != 0)
-            {
-                return curHandles[0];
-            }
-            return null;
-
         }
 
         [TearDown]
