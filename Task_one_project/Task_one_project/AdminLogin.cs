@@ -9,18 +9,22 @@ using System.Collections.Generic;
 using OpenQA.Selenium.Interactions;
 using OpenQA.Selenium.Support.UI;
 using System.IO;
+using OpenQA.Selenium.Support.Events;
 
 namespace Task_one_project
 {
     [TestFixture]
     public class AdminLogin
     {
-        private IWebDriver driver;
+        private EventFiringWebDriver driver;
 
         [SetUp]
         public void Start()
         {
-            driver = new ChromeDriver();
+            driver = new EventFiringWebDriver(new ChromeDriver());
+            driver.FindingElement += (sender, e) => Console.WriteLine(e.FindMethod);
+            driver.FindElementCompleted += (sender, e) => Console.WriteLine(e.FindMethod + " found");
+            driver.ExceptionThrown += (sender, e) => Console.WriteLine(e.ThrownException);
             driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(10);
         }
 
@@ -452,6 +456,55 @@ namespace Task_one_project
 
                 //вернуться обратно
                 driver.SwitchTo().Window(countriesWindow);
+            }
+        }
+
+        [Test]
+        public void Events()
+        {
+            // зайти в админку
+            Login();
+
+            // открыть каталог, категорию, которая содержит товары
+            driver.Url = "http://localhost/litecart/admin/?app=catalog&doc=catalog&category_id=1";
+
+            // последовательно открывать страницы товаров и проверять, не появляются ли в логе браузера сообщения(любого уровня)
+            ReadOnlyCollection<IWebElement> products = driver.FindElements(By.CssSelector(".dataTable tr"));
+            List<string> links = new List<string>();
+            List<bool> isFolder = new List<bool>();
+            for(int i = 2; i < products.Count-1; i++)
+            {
+                IWebElement product = products[i];
+
+                links.Add(product.FindElements(By.CssSelector("td"))[2]
+                        .FindElement(By.CssSelector("a")).GetAttribute("href"));
+                driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(0);
+                isFolder.Add(product.FindElements(By.CssSelector(".fa-folder")).Count != 0);
+            }
+            
+            for (int i = 0; i < products.Count-3; i++)
+            {
+                driver.Url = links[i];
+
+                if (isFolder[i])
+                { 
+                    string subProductUrl = driver.Url;
+
+                    ReadOnlyCollection<IWebElement> subProducts = driver.FindElements(By.CssSelector(".dataTable tr"));
+                    for(int j = 0; j < subProducts.Count - products.Count; j++)
+                    {
+                        subProducts[i+j+3].FindElements(By.CssSelector("td"))[2]
+                        .FindElement(By.CssSelector("a")).Click();
+                       
+                        driver.Url = subProductUrl;
+                        subProducts = driver.FindElements(By.CssSelector(".dataTable tr"));
+                    }
+                }
+                driver.Url = "http://localhost/litecart/admin/?app=catalog&doc=catalog&category_id=1";
+            }
+            foreach (LogEntry l in driver.Manage().Logs.GetLog("browser"))
+            {
+                Console.WriteLine(l);
             }
         }
 
